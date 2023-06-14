@@ -1,3 +1,2 @@
 #!/bin/bash
-dirs=$(find . -type d | wc -l)
-echo $((dirs - 3))
+find . -type d | wc -l
