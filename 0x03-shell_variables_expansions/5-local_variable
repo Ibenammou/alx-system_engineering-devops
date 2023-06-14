@@ -1,3 +1,2 @@
 #!/bin/bash
-echo "BASH=$BASH"
-echo "BASHOPTS=$BASHOPTS"
+set | grep -v "BASH\|BASHOPTS"
