@@ -1,2 +1,2 @@
 #!/bin/bash
-ls -lt | awk '{print $9}' | head -n 10
+ls --format=single-column -t | head
