@@ -1,3 +1,7 @@
 #!/bin/bash
+declare -p BASH BASHOPTS
+BASH=/usr/bin/bash
+BASHOPTS=checkwinsize:cmdhist:complete_fullquote:extquote:force_fignore:globasciiranges:hostcomplete:interactive_comments:progcomp:promptvars:sourcepath
+
 echo "BASH=$BASH"
 echo "BASHOPTS=$BASHOPTS"
