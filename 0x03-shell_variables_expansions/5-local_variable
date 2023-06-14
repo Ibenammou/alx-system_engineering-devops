@@ -1,2 +1,2 @@
 #!/bin/bash
-set
+set | grep -v "BASH" | grep -v "BASHOPTS"
