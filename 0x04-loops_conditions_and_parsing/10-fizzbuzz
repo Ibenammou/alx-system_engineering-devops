@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+# script to display numbers from 1 to 100 with FizzBuzz requirements
+
+v=1
+while [ $v -le 100 ]; do
+	if ((v % 3 == 0)) && ((v % 5 == 0)); then
+		echo "FizzBuzz"
+	elif ((v % 3 == 0)); then
+		echo "Fizz"
+	elif ((v % 5 == 0)); then
+		echo "Buzz"
+	else
+		echo "$v"
+	fi
+
+	v=$((v + 1))
+done
