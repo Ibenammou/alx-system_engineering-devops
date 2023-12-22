@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+# manage_my_process script
+
+# Create a file to store the process ID
+echo $$ > /var/run/my_process.pid
+
+# Function to handle the SIGTERM signal
+handle_sigterm() {
+	# Clean up and exit
+	rm -f /var/run/my_process.pid
+	echo "manage_my_process stopped"
+	exit
+}
+
+# Set up the trap for SIGTERM
+trap 'handle_sigterm' SIGTERM
+
+# Main loop to write "I am alive!: with a 2-second pause
+while true
+do
+	echo "I am alive!" >> /tmp/my_process
+	sleep 2
+done
