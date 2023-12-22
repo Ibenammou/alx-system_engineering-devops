@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# script to display lines containing the bash word
+
+# Shellcheck will report SC2009 error which needs to be ignored
+# shellcheck disable=SC2009
+
+ps aux | grep bash | grep -v grep
