@@ -1,44 +1,26 @@
-#!/bin/bash
-# 101-manage_my_process init script
-
-# Function to start manage_my_process
-start_manage_my_process() {
-	./manage_my_process &
-	echo "$!" > "/var/run/my_process.pid"
-	echo "manage_my_process started"
-}
-
-# Function to stop manage_my_process
-stop_manage_my_process() {
-	sudo pkill -f "./manage_my_process"
-	rm "/var/run/my_process.pid"
-}
-
-restart_manage_my_process() {
-	stop_manage_my_process
-	sleep 2
-	start_manage_my_process
-	echo "manage_my_process restarted"
-}
-
-# Main script
-if [ "$#" -ne 1 ]; then
-	echo "Usage: manage_my_process {start|stop|restart}"
-	exit
-fi
+#!/usr/bin/env bash
 
 case "$1" in
-	start)
-		start_manage_my_process
-		;;
-	stop)
-		stop_manage_my_process
-		;;
-	restart)
-		restart_manage_my_process
-		;;
-	*)
-		echo "Usage: manage_my_process {start|stop|restart}"
-		# exit 1
-		;;
+    start)
+        ./manage_my_process &
+        echo $! > /var/run/my_process.pid
+        echo "manage_my_process started"
+        ;;
+    stop)
+        kill $(cat /var/run/my_process.pid)
+        rm -f /var/run/my_process.pid
+        echo "manage_my_process stopped"
+        ;;
+    restart)
+        kill $(cat /var/run/my_process.pid) 2>/dev/null
+        rm -f /var/run/my_process.pid
+        ./manage_my_process &
+        echo $! > /var/run/my_process.pid
+        echo "manage_my_process restarted"
+        ;;
+    *)
+        echo "Usage: $0 {start|stop|restart}"
+        exit 1
+        ;;
 esac
+
