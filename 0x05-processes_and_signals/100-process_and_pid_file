@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+# this script creates a PID file, displays messages and reponds to handle
+
+handle_s() {
+	echo "I hate the kill command"
+	clean_up_and_exit
+}
+
+handle_sigint() {
+	echo "Y U no love me?!"
+}
+
+clean_up_and_exit() {
+	rm -f /var/run/myscript.pid
+	exit
+}
+
+trap 'handle_s' SIGTERM SIGQUIT
+trap 'handle_sigint' SIGINT
+
+echo $$ > /var/run/myscript.pid
+
+while true
+do
+	echo "To infinity and beyond"
+	sleep 2
+done
