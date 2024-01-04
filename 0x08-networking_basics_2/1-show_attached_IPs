@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Script to display all active IPv4 IPs
 
-# Use ifconfig to get the IPs and filter for IPv4 addresses
-ifconfig | grep -oP 'inet \K[\d.]+'
+# Use hostname command to get the local IP address
+hostname -I | tr -d '[:space:]'
 
