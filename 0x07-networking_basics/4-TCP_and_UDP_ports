@@ -1,4 +1,30 @@
 #!/usr/bin/env bash
-# listening to sockets
+# Script to display listening ports with PID and program name
 
-sudo netstat -lp
+# Display active internet connections with listening sockets
+echo "Active Internet connections (only servers)"
+echo "Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name"
+
+# Display TCP listening sockets
+ss -tln | awk 'NR > 1 {print "tcp", $1, $2, "*", $5, "LISTEN", $6}' | while read line; do
+    pid=$(lsof -i $line | awk 'NR > 1 {print $2}')
+    program=$(ps -p $pid -o comm=)
+    echo "tcp" $line $pid/$program
+done
+
+# Display UDP listening sockets
+ss -uln | awk 'NR > 1 {print "udp", $1, $2, "*", $5, $6}' | while read line; do
+    pid=$(lsof -i $line | awk 'NR > 1 {print $2}')
+    program=$(ps -p $pid -o comm=)
+    echo "udp" $line $pid/$program
+done
+
+# Display active UNIX domain sockets with listening servers
+echo "Active UNIX domain sockets (only servers)"
+echo "Proto RefCnt Flags       Type       State         I-Node   PID/Program name    Path"
+ss -lx | awk '$1 == "u_" {print "unix", $2, $3, $4, $5, $6, $7}' | while read line; do
+    pid=$(lsof $line | awk 'NR > 1 {print $2}')
+    program=$(ps -p $pid -o comm=)
+    echo "unix" $line $pid/$program
+done
+
