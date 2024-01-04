@@ -1,44 +1,44 @@
-#!/bin/bash
-# 101-manage_my_process init script
+#!/usr/bin/env bash
 
-# Function to start manage_my_process
-start_manage_my_process() {
-	./manage_my_process &
-	echo "$!" > "/var/run/my_process.pid"
-	echo "manage_my_process started"
-}
-
-# Function to stop manage_my_process
-stop_manage_my_process() {
-	sudo pkill -f "./manage_my_process"
-	rm "/var/run/my_process.pid"
-}
-
-restart_manage_my_process() {
-	stop_manage_my_process
-	sleep 2
-	start_manage_my_process
-	echo "manage_my_process restarted"
-}
-
-# Main script
-if [ "$#" -ne 1 ]; then
-	echo "Usage: manage_my_process {start|stop|restart}"
-	exit
-fi
+PID_FILE="/var/run/my_process.pid"
 
 case "$1" in
-	start)
-		start_manage_my_process
-		;;
-	stop)
-		stop_manage_my_process
-		;;
-	restart)
-		restart_manage_my_process
-		;;
-	*)
-		echo "Usage: manage_my_process {start|stop|restart}"
-		# exit 1
-		;;
+    start)
+        if [ -f "$PID_FILE" ]; then
+            echo "Error: manage_my_process is already running."
+            exit 1
+        fi
+
+        ./manage_my_process &
+        echo $! > "$PID_FILE"
+        echo "manage_my_process started"
+        ;;
+
+    stop)
+        if [ -f "$PID_FILE" ]; then
+            kill "$(cat $PID_FILE)"
+            rm -f "$PID_FILE"
+            echo "manage_my_process stopped"
+        else
+            echo "Error: manage_my_process is not running."
+            exit 1
+        fi
+        ;;
+
+    restart)
+        if [ -f "$PID_FILE" ]; then
+            kill "$(cat $PID_FILE)" 2>/dev/null
+            rm -f "$PID_FILE"
+        fi
+
+        ./manage_my_process &
+        echo $! > "$PID_FILE"
+        echo "manage_my_process restarted"
+        ;;
+
+    *)
+        echo "Usage: $0 {start|stop|restart}"
+        exit 1
+        ;;
 esac
+
