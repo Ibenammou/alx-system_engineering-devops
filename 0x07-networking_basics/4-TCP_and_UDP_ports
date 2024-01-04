@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# listening to sockets
+
+sudo netstat -lp
