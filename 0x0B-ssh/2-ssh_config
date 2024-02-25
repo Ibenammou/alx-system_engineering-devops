@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# configure the SSH client to refuse password authentication by
+# modifying the '~/.ssh/config' file by creating it if it does
+# not exist
+
+Host *
+    IdentityFile ~/.ssh/school
+    PasswordAuthentication no
+    SendEnv LANG LC_*
+    GSSAPIAuthentication yes
+    HashKnownHosts yes
+    GSSAPIDelegateCredentials no
