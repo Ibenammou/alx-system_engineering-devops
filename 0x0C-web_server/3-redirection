@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# Redirection
+
+sudo apt-get update -y
+sudo apt-get install nginx -y
+echo "Hello World!" | sudo tee /var/www/html/index.nginx-debian.html > /dev/null
+
+N_RED="\\\n\tlocation /redirect_me {\n\t\t return 301 https://www.youtube.com/watch?v=QH2-TGUlwu4;\n\t}\n"
+
+sudo cp /etc/nginx/sites-available/default /etc/nginx/sites-available/default.backup
+
+sudo sed -i "53i $N_RED" /etc/nginx/sites-available/default
+
+# sudo sed -i '/^\server_name.*/a \        rewrite ^/redirect_me https://www.youtube.com/watch?v=QH2-TGUlwu4 permanent;' /etc/nginx/sites-available/default
+
+sudo service nginx restart
