@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+# script to install and configure HAProxy on lb-01 server
+
+
+function install() {
+	# shell check disabling
+	if ! command -v "$1" &> /dev/null; then
+		echo -e "    Installing: $1\n"
+		sudo apt-get update -y -qq && \
+			sudo apt-get install -y "$1" -qq
+		echo -e "\n"
+	else
+		echo -e "    ${1} is already installed.\n"
+	fi
+}
+
+# update package list
+sudo apt-get update
+# Install HAProxy
+sudo apt-get install -y haproxy
+# Backup the original HAProxy configuration file
+sudo cp /etc/haproxy/haproxy.cfg /etc/haproxy/haproxy.cfg.bak
+# Create a new HAProxy configuration file
+sudo tee /etc/haproxy/haproxy.cfg > /dev/null <<EOL
+defaults
+	mode http
+	timeout client 15s
+	timeout connect 10s
+	timeout server 15s
+	timeout http-request 10s
+
+frontend ysg_front
+	bind *:80
+        default_backend ysg_back
+
+backend ysg_back
+        balance roundrobin
+        server 442150-web-01 54.237.74.212:80 check
+        server 442150-web-02 100.25.159.153:80 check
+EOL
+
+echo "ENABLED=1" | sudo dd status=none of=/etc/default/haproxy
+
+# Restart HAProxy to apply the changes
+if [ "$(pgrep -c haproxy)" -le 0 ]; then
+	sudo service haproxy start
+	sleep 2
+else
+	sudo service haproxy restart
+	sleep 2
+fi
