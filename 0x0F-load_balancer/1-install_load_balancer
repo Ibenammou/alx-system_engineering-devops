@@ -35,8 +35,8 @@ frontend ysg_front
 
 backend ysg_back
         balance roundrobin
-        server 442150-web-01 54.237.74.212:80 check
-        server 442150-web-02 100.25.159.153:80 check
+        server 409022-web-01 54.175.253.216 check
+        server 409022-web-02 100.25.102.152 check
 EOL
 
 echo "ENABLED=1" | sudo dd status=none of=/etc/default/haproxy
