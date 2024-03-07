@@ -1,38 +1,36 @@
-#!/bin/bash
+#!/usr/bin/env bash
+# Function to display info about a subdomain
 
-# Function to get IP address for a subdomain
-get_ip() {
-    local subdomain=$1
-    dig +short "$subdomain.$domain" | tail -n1
-}
-
-# Function to print information about a subdomain
-print_info() {
-    local subdomain=$1
-    local ip=$(get_ip "$subdomain")
-    echo "The subdomain $subdomain is a A record and points to $ip"
+display_info() {
+    local sub_domain=$1
+    local domain=$2
+    local result
+    result=$(dig +short "$sub_domain"."$domain")
+    
+    # Check if dig command failed
+    if [ $? -ne 0 ]; then
+        echo "Error: Failed to retrieve information for $sub_domain.$domain"
+        exit 1
+    fi
+    
+    local record_type=$(echo "$result" | awk '{print $1}')
+    local destination=$(echo "$result" | awk '{print $2}')
+    local ttl=$(echo "$result" | awk '{print $3}')
+    
+    echo "The subdomain $sub_domain is a $record_type record and points to $destination"
 }
 
 # Main script
-
-# Ensure correct number of arguments
-if [ "$#" -lt 1 ] || [ "$#" -gt 2 ]; then
+if [ "$#" -eq 1 ]; then
+    # Display info for default subdomains www, lb-01, web-01, web-02
+    for subdomain in www lb-01 web-01 web-02; do
+        display_info "$subdomain" "$1"
+    done
+elif [ "$#" -eq 2 ]; then
+    # Display info for the specified subdomain
+    display_info "$2" "$1"
+else
     echo "Usage: $0 <domain> [subdomain]"
     exit 1
-fi
-
-# Assign domain and subdomain variables
-domain=$1
-subdomain=$2
-
-# If subdomain is not provided, get information for default subdomains
-if [ -z "$subdomain" ]; then
-    print_info www
-    print_info lb-01
-    print_info web-01
-    print_info web-02
-else
-    # Get information for specific subdomain
-    print_info "$subdomain"
 fi
 
