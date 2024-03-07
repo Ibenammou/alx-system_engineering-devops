@@ -1,36 +1,10 @@
 #!/usr/bin/env bash
-# Function to display info about a subdomain
+# script that will display information about subdomains.
 
-display_info() {
-    local sub_domain=$1
-    local domain=$2
-    local result
-    result=$(dig +short "$sub_domain"."$domain")
-    
-    # Check if dig command failed
-    if [ $? -ne 0 ]; then
-        echo "Error: Failed to retrieve information for $sub_domain.$domain"
-        exit 1
-    fi
-    
-    local record_type=$(echo "$result" | awk '{print $1}')
-    local destination=$(echo "$result" | awk '{print $2}')
-    local ttl=$(echo "$result" | awk '{print $3}')
-    
-    echo "The subdomain $sub_domain is a $record_type record and points to $destination"
-}
 
-# Main script
-if [ "$#" -eq 1 ]; then
-    # Display info for default subdomains www, lb-01, web-01, web-02
-    for subdomain in www lb-01 web-01 web-02; do
-        display_info "$subdomain" "$1"
-    done
-elif [ "$#" -eq 2 ]; then
-    # Display info for the specified subdomain
-    display_info "$2" "$1"
+if [ $# -eq 1 ]; then
+	domains="www.$1 lb-01.$1 web-01.$1 web-02.$1"
 else
-    echo "Usage: $0 <domain> [subdomain]"
-    exit 1
+	domains="$2.$1"
 fi
-
+dig $domains | awk '/ANSWER SECTION:/ { getline; split($1, a, "."); print "The subdomain", a[1], "is a", $4, "record and points to", $5}'
