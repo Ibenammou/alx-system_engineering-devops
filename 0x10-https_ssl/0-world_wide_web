@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+# Function to display info about a subdomain
+
+display_info() {
+    sub_dom=$1
+    domain=$2
+    # res=$(dig +short $sub_dom.$domain)
+    rec_tp=$(dig "$sub_dom"."$domain" | awk '/ANSWER SECTION/ {getline; print $4}')
+    dest=$(dig "$sub_dom"."$domain" | awk '/ANSWER SECTION/ {getline; print $5}')
+    # shellcheck disable=SC2034
+    ttl=$(dig "$sub_dom"."$domain" | awk '/ANSWER SECTION/ {getline; print $2}')
+    echo "The subdomain $sub_dom is a $rec_tp record and points to $dest"
+}
+
+# Main script
+if [ "$#" -eq 1 ]; then
+    # Display info for default subdomains www, lb-01, web-01, web-02
+    display_info "www" "$1"
+    display_info "lb-01" "$1"
+    display_info "web-01" "$1"
+    display_info "web-02" "$1"
+elif [ "$#" -eq 2 ]; then
+    # Display info for the specified subdomain
+    display_info "$2" "$1"
+else
+    echo "Usage: $0 <domain> [subdomain]"
+    exit 1
+fi
