@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# making a shorter nginx port 80 script
+sudo sed -i 's/8080/80/' /etc/nginx/sites-enabled/default
+sudo service nginx restart
+echo "" | sudo dd status=none of=/run/nginx.pid

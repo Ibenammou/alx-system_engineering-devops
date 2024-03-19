@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# Bash script to listen on port 98 on localhost
+
+# Set up a simple TCP server on port 98
+nc -l -p 98
+

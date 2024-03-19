@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+# Script configures Nginx on a new Ubuntu maachine to include custom
+# HTTP response
+
+sudo apt-get update
+sudo apt-get upgrade -y
+sudo apt-get install -y nginx
+
+# Create the index.html with "Hello World!" page
+echo "Hello World!" | sudo tee /var/www/html/index.html > /dev/null
+
+# configure Nginx to include the custom HTTP response header
+sudo sed -i "51i \\\tadd_header X-Served-By $HOSTNAME;" /etc/nginx/sites-enabled/default
+
+# Personalized 301 page
+echo "https://www.youtube.com/watch?v=QH2-TGUlwu4" | sudo tee /var/www/html/redirect_me
+new_add="\\\n\tlocation /redirect_me {\n\t\treturn 301 https:\/\/www.youtube.com\/watch?v=QH2-TGUlwu4;\n\t}\n"
+sudo sed -i "54i $new_add" /etc/nginx/sites-enabled/default
+
+# Personalized 404 Page
+echo "Ceci n'est pas une page" | sudo tee /var/www/html/404.html
+n_add="\\\n\terror_page 404 \/404.html;\n\tlocation = \/404.html {\n\t\tinternal;\n\t}"
+
+sudo sed -i "58i $n_add" /etc/nginx/sites-enabled/default
+
+# Check for configuration errors
+sudo nginx -t
+
+# Restart Nginx
+sudo service nginx restart
