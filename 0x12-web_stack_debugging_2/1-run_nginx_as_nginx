@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+# script that configures the container to run Nginx as the nginx user
+# give conf permission
+set -x
+# sudo apt-get update -y
+# sudo apt-get upgrade -y
+# sudo apt-get install -y nginx
+pkill apache2
+sudo chown nginx:nginx /etc/nginx/nginx.conf
+sudo chmod 644 /etc/nginx/nginx.conf
+sudo chown nginx:nginx /etc/nginx/sites-available/default
+sudo chmod 644 /etc/nginx/sites-available/default
+ch_portconf="/etc/nginx/sites-available/default"
+# n_port=8080
+
+# update nginx.conf
+sudo sed -Ei "s/\s*#?\s*user .*/user nginx;/" /etc/nginx/nginx.conf
+# sudo touch /run/nginx.pid
+# sudo chown nginx:nginx /run/nginx.pid
+
+sudo sed -i "s/\(listen\s*\)80/\18080/" "$ch_portconf"
+sudo sed -Ei "s/(listen (\[::\]:?80))/\180/" "$ch_portconf"
+sudo -u nginx service nginx restart
