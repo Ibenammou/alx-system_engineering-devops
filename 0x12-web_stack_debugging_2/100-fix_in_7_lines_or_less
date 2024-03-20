@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-# script that configures the container to run Nginx as the nginx user
-sudo sed -Ei "s/\s*#?\s*user .*/user nginx;/" /etc/nginx/nginx.conf
-sudo sed -i "s/\(listen\s*\)80/\18080/" /etc/nginx/sites-enabled/default
-sudo sed -Ei "s/(listen (\[::\]:?80))/\180/" /etc/nginx/sites-enabled/default
-sudo service nginx restart
+# Fix this container so that Nginx is running as user "nginx"
+pkill apache2
+chown -R nginx /etc/nginx
+chmod 770 /etc/nginx/nginx.conf
+sed -i "s/80/8080/g" /etc/nginx/sites-available/default
+sudo -u nginx service nginx restart
