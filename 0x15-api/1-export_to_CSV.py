@@ -6,33 +6,42 @@ employees and exporting to CSV
 
 import requests
 import sys
-
+import certifi
 
 if __name__ == '__main__':
     # Check for the correct number of command-line args
+    if len(sys.argv) != 2:
+        print("Usage: {} <employee_id>".format(sys.argv[0]))
+        sys.exit(1)
 
     employee_id = sys.argv[1]
     url = "https://jsonplaceholder.typicode.com/users"
     user_url = url + '/' + employee_id
 
-    res_user = requests.get(user_url)
-    # res_user.raise_for_status()
+    try:
+        # Make the request with SSL verification
+        res_user = requests.get(user_url, verify=certifi.where())
 
-    # user_id = res_user.json().get('id')
-    user_n = res_user.json().get('user_n')
-    # print("User ID: {} / Username: {}".format(user_id, user_n))
+        # Check if the request was successful
+        res_user.raise_for_status()
 
-    todo_url = user_url + '/todos'
-    res_todo = requests.get(todo_url)
-    # res_todo.raise_for_status()
+        user_n = res_user.json().get('username')
 
-    tasks = res_todo.json()
+        todo_url = user_url + '/todos'
+        res_todo = requests.get(todo_url, verify=certifi.where())
 
-    # print("Number of tasks in CSV:", len(tasks))
+        # Check if the request was successful
+        res_todo.raise_for_status()
 
-    with open('{}.csv'.format(employee_id), 'w') as file:
-        for task in tasks:
-            file.write('"{}","{}","{}","{}"\n'.format(employee_id,
-                       user_n, task.get('completed'), task.get('title')))
+        tasks = res_todo.json()
 
-    # print("Data exported to {}.csv".format(employee_id))
+        with open('{}.csv'.format(employee_id), 'w') as file:
+            for task in tasks:
+                file.write('"{}","{}","{}","{}"\n'.format(employee_id,
+                           user_n, task.get('completed'), task.get('title')))
+
+        print("Data exported to {}.csv".format(employee_id))
+
+    except requests.RequestException as e:
+        print("Error:", str(e))
+
