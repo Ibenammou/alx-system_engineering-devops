@@ -5,8 +5,8 @@ employees and exporting to CSV
 """
 
 import certifi
-import sys
 import requests
+import sys
 
 if __name__ == '__main__':
     # Check for the correct number of command-line args
