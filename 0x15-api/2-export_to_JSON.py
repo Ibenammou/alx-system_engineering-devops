@@ -17,20 +17,19 @@ if __name__ == '__main__':
         sys.exit(1)
 
     employee_id = sys.argv[1]
-    url = "https://jsonplaceholder.typicode.com/users"
-    user_url = url + '/' + employee_id
+    user_url = "https://jsonplaceholder.typicode.com/users/{}".format(employee_id)
 
     res_user = requests.get(user_url)
     res_user.raise_for_status()
 
     user_id = res_user.json().get('id')
 
-    todo_url = user_url + '/todos'
+    todo_url = "{}/todos".format(user_url)
     res_todo = requests.get(todo_url)
     res_todo.raise_for_status()
 
     tasks = res_todo.json()
-    
+
     diction = OrderedDict({user_id: []})
     for task in tasks:
         diction[user_id].append(OrderedDict({
