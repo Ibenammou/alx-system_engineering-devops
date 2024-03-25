@@ -18,40 +18,27 @@ if __name__ == '__main__':
 
     employee_id = sys.argv[1]
     url = "https://jsonplaceholder.typicode.com/users"
-    user_url = "{}/{}".format(url, employee_id)
+    user_url = url + '/' + employee_id
 
-    try:
-        res_user = requests.get(user_url)
-        res_user.raise_for_status()
-        user_data = res_user.json()
-        user_name = user_data.get('name')
-    except requests.RequestException as e:
-        print("Error fetching user data:", e)
-        sys.exit(1)
+    res_user = requests.get(user_url)
+    res_user.raise_for_status()
 
-    todo_url = "{}/{}/todos".format(url, employee_id)
+    user_id = res_user.json().get('id')
 
-    try:
-        res_todo = requests.get(todo_url)
-        res_todo.raise_for_status()
-        tasks = res_todo.json()
-    except requests.RequestException as e:
-        print("Error fetching TODO list:", e)
-        sys.exit(1)
+    todo_url = user_url + '/todos'
+    res_todo = requests.get(todo_url)
+    res_todo.raise_for_status()
 
-    todo_list = []
+    tasks = res_todo.json()
+    
+    diction = OrderedDict({user_id: []})
     for task in tasks:
-        todo_list.append(OrderedDict({
+        diction[user_id].append(OrderedDict({
             "task": task.get('title'),
             "completed": task.get('completed'),
-            "username": user_name
+            "username": res_user.json().get('username')
         }))
 
-    output_data = OrderedDict({employee_id: todo_list})
+    with open('{}.json'.format(user_id), 'w') as filename:
+        json.dump(diction, filename)
 
-    try:
-        with open('{}.json'.format(employee_id), 'w') as filename:
-            json.dump(output_data, filename, indent=4)
-        print("Data exported to {}.json".format(employee_id))
-    except IOError as e:
-        print("Error writing to file:", e)
