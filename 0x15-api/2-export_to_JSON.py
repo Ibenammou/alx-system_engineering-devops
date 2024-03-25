@@ -1,44 +1,44 @@
 #!/usr/bin/python3
 """
-Accessing a REST API for todo lists of
-employees and exporting to CSV
+Check student JSON output
 """
 
-from collections import OrderedDict
 import json
 import requests
 import sys
 
+users_url = "https://jsonplaceholder.typicode.com/users?id="
+todos_url = "https://jsonplaceholder.typicode.com/todos"
 
-if __name__ == '__main__':
-    # Check for the correct number of command-line args
 
-    employee_id = sys.argv[1]
-    url = "https://jsonplaceholder.typicode.com/users"
-    user_url = url + '/' + employee_id
+def user_info(id):
+    """ Check user info """
+    
+    with open(str(id) + '.json', 'r') as f:
+        student_json = json.load(f)
 
-    res_user = requests.get(user_url)
-    # res_user.raise_for_status()
+    student_dicts = student_json[str(id)]
+    
+    response = requests.get(todos_url).json()
+    flag = 0
+    json_count = 0
+    not_found_count = 0
+    for i in response:
+        if i['userId'] == id:
+            usr_resp = requests.get(users_url + str(i['userId'])).json()
+            json_entry = {'username': usr_resp[0]['username'], 'completed': i['completed'], 'task': i['title']}
+            json_count += 1
+            flag = 0
+            for item in student_dicts:
+                if json_entry == item:
+                    flag = 1
+            if flag == 0:
+                not_found_count += 1
 
-    # user_id = res_user.json().get('id')
-    user_n = res_user.json().get('user_n')
-    # print("User ID: {} / Username: {}".format(user_id, user_n))
+    if not_found_count != 0:
+        print("Number of tasks missing: {}".format(not_found_count))
+    else:
+        print("All tasks found: OK")
 
-    todo_url = user_url + '/todos'
-    res_todo = requests.get(todo_url)
-    # res_todo.raise_for_status()
-
-    tasks = res_todo.json()
-    # sorted_tasks = sorted(tasks, key=lambda x: x['title'])
-    diction = OrderedDict({employee_id: []})
-    for task in tasks:
-        diction[employee_id].append(OrderedDict({"task": task.get('title'),
-                                                 "completed":
-                                                 task.get('completed'),
-                                                 "username": user_n}))
-
-    # sorted_entries = sorted(diction[employee_id], key=lambda x: x['task'])
-    # diction[employee_id] = sorted_entries
-
-    with open('{}.json'.format(employee_id), 'w') as filename:
-        json.dump(diction, filename)
+if __name__ == "__main__":
+    user_info(int(sys.argv[1]))
