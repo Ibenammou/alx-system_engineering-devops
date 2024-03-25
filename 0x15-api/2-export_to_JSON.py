@@ -1,44 +1,57 @@
 #!/usr/bin/python3
 """
-Check student JSON output
+Accessing a REST API for todo lists of
+employees and exporting to JSON
 """
 
+from collections import OrderedDict
 import json
 import requests
 import sys
 
-users_url = "https://jsonplaceholder.typicode.com/users?id="
-todos_url = "https://jsonplaceholder.typicode.com/todos"
 
+if __name__ == '__main__':
+    # Check for the correct number of command-line args
+    if len(sys.argv) != 2:
+        print("Usage: {} <employee_id>".format(sys.argv[0]))
+        sys.exit(1)
 
-def user_info(id):
-    """ Check user info """
-    
-    with open(str(id) + '.json', 'r') as f:
-        student_json = json.load(f)
+    employee_id = sys.argv[1]
+    url = "https://jsonplaceholder.typicode.com/users"
+    user_url = "{}/{}".format(url, employee_id)
 
-    student_dicts = student_json[str(id)]
-    
-    response = requests.get(todos_url).json()
-    flag = 0
-    json_count = 0
-    not_found_count = 0
-    for i in response:
-        if i['userId'] == id:
-            usr_resp = requests.get(users_url + str(i['userId'])).json()
-            json_entry = {'username': usr_resp[0]['username'], 'completed': i['completed'], 'task': i['title']}
-            json_count += 1
-            flag = 0
-            for item in student_dicts:
-                if json_entry == item:
-                    flag = 1
-            if flag == 0:
-                not_found_count += 1
+    try:
+        res_user = requests.get(user_url)
+        res_user.raise_for_status()
+        user_data = res_user.json()
+        user_name = user_data.get('name')
+    except requests.RequestException as e:
+        print("Error fetching user data:", e)
+        sys.exit(1)
 
-    if not_found_count != 0:
-        print("Number of tasks missing: {}".format(not_found_count))
-    else:
-        print("All tasks found: OK")
+    todo_url = "{}/{}/todos".format(url, employee_id)
 
-if __name__ == "__main__":
-    user_info(int(sys.argv[1]))
+    try:
+        res_todo = requests.get(todo_url)
+        res_todo.raise_for_status()
+        tasks = res_todo.json()
+    except requests.RequestException as e:
+        print("Error fetching TODO list:", e)
+        sys.exit(1)
+
+    todo_list = []
+    for task in tasks:
+        todo_list.append(OrderedDict({
+            "task": task.get('title'),
+            "completed": task.get('completed'),
+            "username": user_name
+        }))
+
+    output_data = OrderedDict({employee_id: todo_list})
+
+    try:
+        with open('{}.json'.format(employee_id), 'w') as filename:
+            json.dump(output_data, filename, indent=4)
+        print("Data exported to {}.json".format(employee_id))
+    except IOError as e:
+        print("Error writing to file:", e)
