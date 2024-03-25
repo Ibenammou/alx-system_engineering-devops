@@ -7,18 +7,19 @@ using a REST API
 import requests
 from sys import argv
 
+
 def fetch_data(employee_id):
     user_url = 'https://jsonplaceholder.typicode.com/users/{}'
-    res = requests.get(user_url.format(employee_id), verify=False)
+    res = requests.get(user_url.format(employee_id))
     res.raise_for_status()
-    return res.json().get('name')
+    return (res.json().get('name'))
 
 
 def fetch_todo(employee_id):
     tasks_url = 'https://jsonplaceholder.typicode.com/users/{}/todos'
-    res = requests.get(tasks_url.format(employee_id), verify=False)
+    res = requests.get(tasks_url.format(employee_id))
     res.raise_for_status()
-    return res.json()
+    return (res.json())
 
 
 if __name__ == "__main__":
