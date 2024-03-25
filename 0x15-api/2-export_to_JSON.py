@@ -17,7 +17,8 @@ if __name__ == '__main__':
         sys.exit(1)
 
     employee_id = sys.argv[1]
-    user_url = "https://jsonplaceholder.typicode.com/users/{}".format(employee_id)
+    user_url = ("https://jsonplaceholder.typicode.com/users/"
+                "{}".format(employee_id))
 
     res_user = requests.get(user_url)
     res_user.raise_for_status()
