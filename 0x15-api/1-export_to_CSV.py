@@ -4,8 +4,8 @@ Accessing a REST API for todo lists of
 employees and exporting to CSV
 """
 
-import requests
 import sys
+import requests
 import certifi
 
 if __name__ == '__main__':
@@ -13,6 +13,8 @@ if __name__ == '__main__':
     if len(sys.argv) != 2:
         print("Usage: {} <employee_id>".format(sys.argv[0]))
         sys.exit(1)
+
+    import certifi  # Move certifi import here
 
     employee_id = sys.argv[1]
     url = "https://jsonplaceholder.typicode.com/users"
